@@ -1,0 +1,11 @@
+version: '3.1'
+
+services:
+  api:
+    image: products-microservice
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "8080:8080"

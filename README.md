@@ -1,8 +1,8 @@
 # Products Microservice
 
-Simple microservice that handle product related endpoints in an ecommerce app
+Simple microservice that handle product related endpoints in an e-commerce app
 
-## Stack :toolbox:
+## :toolbox: Stack
 - Kotlin
 - Spring Boot
 - Webflux
@@ -12,7 +12,7 @@ Simple microservice that handle product related endpoints in an ecommerce app
 
 ---
 
-## Running the app :rocket:
+## :rocket: Running the app
 - Requirements:
   - Java (openjdk 11)
   - Recommended IDE: IntelliJ IDEA
@@ -22,12 +22,17 @@ Build the app (run the command inside the project dir):
 ./gradew build
 ```
 
-Run the app:
+Run via command line:
 ```shell
 ./gradew bootRun
 ```
 
+or via Docker 🐳:
+```shell
+docker-compose up
+```
+
 ---
 
-## Docs :books:
+## :books: Docs
 The API documentation is available on Swagger, you can access it on `http://localhost:8080/swagger-ui.html`
