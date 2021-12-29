@@ -15,6 +15,8 @@ repositories {
 	mavenCentral()
 }
 
+apply(plugin = "jacoco")
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:2.5.6")
 	implementation("org.springframework.boot:spring-boot-starter-webflux:2.6.1")
@@ -43,6 +45,13 @@ tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict")
 		jvmTarget = "11"
+	}
+}
+
+tasks.withType<JacocoReport> {
+	reports {
+		xml.isEnabled = true
+		html.isEnabled = false
 	}
 }
 
