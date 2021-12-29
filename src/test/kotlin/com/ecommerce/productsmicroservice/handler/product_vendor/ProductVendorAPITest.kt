@@ -7,7 +7,6 @@ import com.ecommerce.productsmicroservice.utils.PostgresTestContainerBuilder
 import com.ecommerce.productsmicroservice.utils.getDBConnectionAndTemplate
 import io.r2dbc.postgresql.PostgresqlConnectionFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,6 +19,8 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import reactor.test.StepVerifier
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 @ComponentScan("com.ecommerce.productsmicroservice")
@@ -27,7 +28,7 @@ import reactor.test.StepVerifier
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Testcontainers
-internal class ProductVendorAPITest @Autowired constructor(private val repository: ProductVendorRepository) {
+internal class ProductVendorAPITest @Autowired constructor(repository: ProductVendorRepository) {
 
     private val baseUrl = "/api/v1/product_vendor"
 
@@ -79,17 +80,27 @@ internal class ProductVendorAPITest @Autowired constructor(private val repositor
         template = dbConfig.template
     }
 
-    @AfterEach
-    fun clear() = runBlocking {
-        println("-> Clearing database...")
-        repository.deleteAll()
-        println("-> Database cleared.")
+    @BeforeEach
+    fun prepare() {
+        template.delete(ProductVendor::class.java).all().block()
     }
 
     @Nested
     @DisplayName("get all")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class GetAll {
+        @Test
+        fun `should return empty array when there is no data`() = runTest {
+            // when/then
+            client.get()
+                .uri(baseUrl)
+                .exchange()
+                .expectStatus().isOk
+                .expectBody()
+                .jsonPath("$.data.length()")
+                .isEqualTo(0)
+        }
+
         @Test
         fun `should return all vendors`() = runTest {
             // given
@@ -102,7 +113,6 @@ internal class ProductVendorAPITest @Autowired constructor(private val repositor
             vendors.forEach { vendor ->
                 template.insert(ProductVendor::class.java)
                     .using(vendor)
-                    .doOnNext { println(it) }
                     .`as`(StepVerifier::create)
                     .assertNext { t -> Assertions.assertEquals(t.name, vendor.name) }
                     .verifyComplete()
@@ -118,6 +128,75 @@ internal class ProductVendorAPITest @Autowired constructor(private val repositor
                 .isEqualTo(3)
                 .jsonPath("$.data[0].name")
                 .isEqualTo("vendor_1")
+        }
+    }
+
+    @Nested
+    @DisplayName("search")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class Search {
+        @Test
+        fun `should return expected vendor`() {
+            // given
+            val vendors = listOf(
+                ProductVendor(name = "vendor_1", description = "vendor_1_desc"),
+                ProductVendor(name = "vendor_2", description = "vendor_2_desc"),
+                ProductVendor(name = "vendor_3", description = "vendor_3_desc"),
+            )
+
+            vendors.forEach { vendor ->
+                template.insert(ProductVendor::class.java)
+                    .using(vendor)
+                    .`as`(StepVerifier::create)
+                    .assertNext { t -> Assertions.assertEquals(t.name, vendor.name) }
+                    .verifyComplete()
+            }
+
+            // when/then
+            client.get()
+                .uri("$baseUrl/search?name=vendor_1")
+                .exchange()
+                .expectStatus().isOk
+                .expectBody()
+                .jsonPath("$.data.length()")
+                .isEqualTo(1)
+                .jsonPath("$.data[0].name")
+                .isEqualTo("vendor_1")
+        }
+
+        @Test
+        fun `should return empty list when filtering with a future date`() {
+            // given
+            val vendors = listOf(
+                ProductVendor(name = "vendor_1", description = "vendor_1_desc"),
+                ProductVendor(name = "vendor_2", description = "vendor_2_desc"),
+                ProductVendor(name = "vendor_3", description = "vendor_3_desc"),
+            )
+
+            vendors.forEach { vendor ->
+                template.insert(ProductVendor::class.java)
+                    .using(vendor)
+                    .`as`(StepVerifier::create)
+                    .assertNext { t -> Assertions.assertEquals(t.name, vendor.name) }
+                    .verifyComplete()
+            }
+
+            // when
+            val today = LocalDateTime.now()
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            val createdAtGTE = formatter.format(today.plusDays(1))
+            val createdAtLTE = formatter.format(today.plusDays(2))
+
+            // then
+            client.get()
+                .uri(
+                    "$baseUrl/search?createdAtGTE=$createdAtGTE&createdAtLTE=$createdAtLTE"
+                )
+                .exchange()
+                .expectStatus().isOk
+                .expectBody()
+                .jsonPath("$.data.length()")
+                .isEqualTo(0)
         }
     }
 }
