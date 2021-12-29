@@ -27,10 +27,16 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.5.2-native-mt")
 	implementation("io.r2dbc:r2dbc-postgresql:0.8.10.RELEASE")
+	implementation("org.liquibase:liquibase-core:4.6.2")
 	runtimeOnly("io.r2dbc:r2dbc-postgresql:0.8.10.RELEASE")
 	runtimeOnly("org.postgresql:postgresql:42.3.1")
 	testImplementation("org.springframework.boot:spring-boot-starter-test:2.6.1")
 	testImplementation("io.projectreactor:reactor-test:3.4.13")
+	testImplementation("io.mockk:mockk:1.12.1")
+	testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
+	testImplementation("org.testcontainers:testcontainers:1.16.2")
+	testImplementation("org.testcontainers:junit-jupiter:1.16.2")
+	testImplementation("org.testcontainers:postgresql:1.16.2")
 }
 
 tasks.withType<KotlinCompile> {
