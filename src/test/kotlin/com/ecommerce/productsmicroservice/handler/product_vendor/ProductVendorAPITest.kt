@@ -181,22 +181,44 @@ internal class ProductVendorAPITest @Autowired constructor(repository: ProductVe
                     .verifyComplete()
             }
 
-            // when
             val today = LocalDateTime.now()
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
             val createdAtGTE = formatter.format(today.plusDays(1))
             val createdAtLTE = formatter.format(today.plusDays(2))
 
-            // then
+            // when/then
             client.get()
-                .uri(
-                    "$baseUrl/search?createdAtGTE=$createdAtGTE&createdAtLTE=$createdAtLTE"
-                )
+                .uri("$baseUrl/search?createdAtGTE=$createdAtGTE&createdAtLTE=$createdAtLTE")
                 .exchange()
                 .expectStatus().isOk
                 .expectBody()
                 .jsonPath("$.data.length()")
                 .isEqualTo(0)
+        }
+
+        @Test
+        fun `should return bad request when filtering with incomplete interval`() {
+
+            // given
+            val today = LocalDateTime.now()
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            val createdAtGTE = formatter.format(today.plusDays(1))
+            val updatedAtGTE = formatter.format(today.plusDays(1))
+
+            // when/then
+            client.get()
+                .uri("$baseUrl/search?createdAtGTE=$createdAtGTE")
+                .exchange()
+                .expectStatus().isBadRequest
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("Invalid date range for createdAt")
+
+            client.get()
+                .uri("$baseUrl/search?updatedAtGTE=$updatedAtGTE")
+                .exchange()
+                .expectStatus().isBadRequest
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("Invalid date range for updatedAt")
         }
     }
 }
