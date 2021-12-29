@@ -19,7 +19,7 @@ class ProductVendorHandler(private val service: ProductVendorService) {
     suspend fun getAll(req: ServerRequest): ServerResponse {
         val response = service.findAll().collectList().awaitSingle()
 
-        return ServerResponse.ok().bodyValueAndAwait(response)
+        return ServerResponse.ok().bodyValueAndAwait(ListResponseDTO(data = response))
     }
 
     suspend fun search(req: ServerRequest): ServerResponse {
