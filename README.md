@@ -9,6 +9,19 @@ Simple microservice that handle product related endpoints in an e-commerce app
 - R2DBC
 - Postgres
 - Swagger
+- Testcontainers
+
+## :sparkles: Features
+
+- REST API using Webflux functional endpoints
+- R2DBC repositories
+- Coroutines support
+- Integration tests with Testcontainers
+- Liquibase migrations
+- Swagger documentation
+- TODO:
+  - CI/CD
+  - Test Coverage
 
 ---
 
