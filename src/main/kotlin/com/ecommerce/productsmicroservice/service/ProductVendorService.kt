@@ -1,6 +1,5 @@
 package com.ecommerce.productsmicroservice.service
 
-import com.ecommerce.productsmicroservice.dto.PatchProductVendorDTO
 import com.ecommerce.productsmicroservice.dto.ProductVendorDTO
 import com.ecommerce.productsmicroservice.entity.ProductVendor
 import com.ecommerce.productsmicroservice.repository.ProductVendorRepository
@@ -25,14 +24,13 @@ class ProductVendorService(private val repository: ProductVendorRepository) {
 
     suspend fun findById(id: Long): Mono<ProductVendor> = repository.findById(id)
 
-    suspend fun create(resource: ProductVendorDTO): Mono<ProductVendor> = repository.save(
+    suspend fun create(resource: ProductVendorDTO.Create): Mono<ProductVendor> = repository.save(
         ProductVendor(
-            name = resource.name,
-            description = resource.description
+            name = resource.name, description = resource.description
         )
     )
 
-    suspend fun update(id: Long, resource: PatchProductVendorDTO): Mono<ProductVendor> {
+    suspend fun update(id: Long, resource: ProductVendorDTO.Patch): Mono<ProductVendor> {
         val existingProductVendor = repository.findById(id).awaitSingleOrNull()
 
         return when (existingProductVendor == null) {

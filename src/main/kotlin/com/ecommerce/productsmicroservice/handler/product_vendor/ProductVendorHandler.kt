@@ -2,7 +2,6 @@ package com.ecommerce.productsmicroservice.handler.product_vendor
 
 import com.ecommerce.productsmicroservice.dto.ErrorDTO
 import com.ecommerce.productsmicroservice.dto.ListResponseDTO
-import com.ecommerce.productsmicroservice.dto.PatchProductVendorDTO
 import com.ecommerce.productsmicroservice.dto.ProductVendorDTO
 import com.ecommerce.productsmicroservice.service.ProductVendorService
 import kotlinx.coroutines.reactor.awaitSingle
@@ -40,12 +39,17 @@ class ProductVendorHandler(private val service: ProductVendorService) {
         }
 
         val name = if (nameParam.isPresent) nameParam.get().lowercase() else null
-        val createdAtGTE = if (createdAtGTEParam.isPresent) LocalDateTime.parse(createdAtGTEParam.get(), formatter) else null
-        val createdAtLTE = if (createdAtLTEParam.isPresent) LocalDateTime.parse(createdAtLTEParam.get(), formatter) else null
-        val updatedAtGTE = if (updatedAtGTEParam.isPresent) LocalDateTime.parse(updatedAtGTEParam.get(), formatter) else null
-        val updatedAtLTE = if (updatedAtLTEParam.isPresent) LocalDateTime.parse(updatedAtLTEParam.get(), formatter) else null
+        val createdAtGTE =
+            if (createdAtGTEParam.isPresent) LocalDateTime.parse(createdAtGTEParam.get(), formatter) else null
+        val createdAtLTE =
+            if (createdAtLTEParam.isPresent) LocalDateTime.parse(createdAtLTEParam.get(), formatter) else null
+        val updatedAtGTE =
+            if (updatedAtGTEParam.isPresent) LocalDateTime.parse(updatedAtGTEParam.get(), formatter) else null
+        val updatedAtLTE =
+            if (updatedAtLTEParam.isPresent) LocalDateTime.parse(updatedAtLTEParam.get(), formatter) else null
 
-        val response = service.search(name, createdAtGTE, createdAtLTE, updatedAtGTE, updatedAtLTE).collectList().awaitSingle()
+        val response =
+            service.search(name, createdAtGTE, createdAtLTE, updatedAtGTE, updatedAtLTE).collectList().awaitSingle()
 
         return ServerResponse.ok().bodyValueAndAwait(ListResponseDTO(data = response))
     }
@@ -61,7 +65,7 @@ class ProductVendorHandler(private val service: ProductVendorService) {
     }
 
     suspend fun create(req: ServerRequest): ServerResponse {
-        val payload = req.bodyToMono<ProductVendorDTO>().awaitSingleOrNull()
+        val payload = req.bodyToMono<ProductVendorDTO.Create>().awaitSingleOrNull()
             ?: return ServerResponse.unprocessableEntity().buildAndAwait()
 
         val createdResource = service.create(payload).awaitSingle()
@@ -75,7 +79,7 @@ class ProductVendorHandler(private val service: ProductVendorService) {
         val id = req.pathVariable("id").toLongOrNull()
             ?: return ServerResponse.unprocessableEntity().buildAndAwait()
 
-        val payload = req.bodyToMono<PatchProductVendorDTO>()
+        val payload = req.bodyToMono<ProductVendorDTO.Patch>()
             .awaitSingleOrNull()
             ?: return ServerResponse.badRequest().buildAndAwait()
 
