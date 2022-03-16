@@ -1,23 +1,21 @@
 databaseChangeLog:
-  - logicalFilePath: initial_migration.yaml
+  - logicalFilePath: product_category_table.yaml
 
   - changeSet:
-      logicalFilePath: initial_migration.yaml
-      id: 1
+      logicalFilePath: product_category_table.yaml
+      id: 2
       author: anderson malheiro
-      comment: creating product vendors table
+      comment: creating product categories table
       changes:
         - sql:
             sql: >
-              create table product_vendors
+              create table product_categories
               (
                   id serial
-                      constraint product_vendors_pk
+                      constraint product_categories_pk
                           primary key,
                   name varchar not null,
                   description varchar,
                   created_at timestamp with time zone default CURRENT_TIMESTAMP,
                   updated_at timestamp with time zone default CURRENT_TIMESTAMP
               );
-
-              alter table product_vendors owner to anderson;

@@ -1,5 +1,5 @@
 databaseChangeLog:
   - includeAll:
       relativeToChangelogFile: true
-      path: steps
+      path: changelog
   - logicalFilePath: path-independent
