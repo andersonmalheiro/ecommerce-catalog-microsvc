@@ -4,11 +4,16 @@ import com.ecommerce.productsmicroservice.dto.ProductCategoryDTO
 import com.ecommerce.productsmicroservice.entity.ProductCategory
 import com.ecommerce.productsmicroservice.repository.ProductCategoryRepository
 import kotlinx.coroutines.reactor.awaitSingleOrNull
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Service
 class ProductCategoryService(private val repository: ProductCategoryRepository) {
+    suspend fun findAll(): Flux<ProductCategory> =
+        repository.findAll(Sort.by(Sort.Direction.ASC, "id"))
+    
     suspend fun create(resource: ProductCategoryDTO.Create): Mono<ProductCategory> =
         repository.save(
             ProductCategory(
