@@ -37,7 +37,7 @@ internal class ProductVendorServiceTest {
         @Test
         fun `should create a product vendor`() = runTest {
             // given
-            val resource = ProductVendorDTO(name = "p_name", description = "p_desc")
+            val resource = ProductVendorDTO.Create(name = "p_name", description = "p_desc")
             val result = ProductVendor(name = resource.name, description = resource.description)
 
             // when

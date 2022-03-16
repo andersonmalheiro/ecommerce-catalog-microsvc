@@ -1,5 +1,6 @@
 package com.ecommerce.productsmicroservice.dto
 
+
 class ProductVendorDTO {
     data class Create(
         val name: String,
